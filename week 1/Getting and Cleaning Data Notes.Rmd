@@ -5,6 +5,136 @@ date: "July 9, 2018"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+# Getting and Cleaning Data Notes
+## Week 1
+### Raw and Processed Data
+#### Definition of Data
+####*•*	Definition of Data: Data are values of qualitative or quantitative variables, belonging to a set of items.
+####*•*	Qualitative: country of origin, sex, treatment
+####*•*	Qualitative: Height, weight, blood pressure
+#### Raw verse processed data
+####*•*	Raw Data
+####+ The original source of the data
+####+	Often hard to use for data analyses
+####+	Data analysis includes processing
+####+	Raw data may only need to be processed once
+####*•*	Processed data on split file
+####+	Data that is ready for analysis
+####+	Processing can include merging, subsetting, transforming, etc.
+####+	There may be standards for processing
+####+	All steps should be recorded
+#### An example of a processing pipeline
+####*•*	Human genome project at 1st took 10 years and over $1 billion
+####*•*	Now that can be done in a week for $10,000
+####*•*	Data is becoming cheaper and faster to obtain
+####*•*	Sequencing by synthesis: the brightest color in each sequence is assigned to the corresponding letter
+### Components of Tidy Data
+The four things you should have
+•	The raw data
+•	A tidy data set
+•	A code book describing each variable and its value in the tidy data set.
+•	An explicit and exact recipe you use to go from 1-> 2, 3.
+The raw data
+•	The strange binary file your measurement machine
+•	The unformatted Excel file with 10 worksheets the company you contracted with sent you
+•	The uncomplicated JSON data you got from scraping the Twitter API
+•	The hand-entered numbers you collected looking through a microscope
+
+You know the raw data is in the right format if you
+
+•	Ran no software on the data
+•	Did not manipulate any of the numbers in the data
+•	You did not remove any data from the data set
+•	You did not summarize the data in any way
+The tidy data
+•	Each variable you measure should be in one column
+•	Each different observation of that variable should be in a different row
+•	There should be one table for each “kind” of variable
+•	If you have multiple tables, they should include a column in the table that allows them to be linked
+Some other important tips
+•	Include a row at the top of each file with variable names.
+•	Make variable names human readable Age at Diagnosis instead of AgeDx
+•	In general data should be saved in one file per table.
+The code book
+•	Information about the variables (including units!) In the data set not contained in the tidy data
+•	Information about summary choices you made
+•	Information about the experimental study design you used
+Some other important tips
+•	A common format is a word/text file.
+•	There should be a section called “study design” that has a thorough description of how you collected the data.
+•	There must be a section called “Code book” that describes each variable and its units.
+The instruction list
+•	Ideally a computer script (in R :-)), but I suppose Python is okay too…)
+•	The input for the script in the raw data
+•	The output a process, tidy data
+•	There are no parameters to the scripts
+In some cases it will not be possible to scripts every step. In that case you should provide instruction like:
+•	Step 1 – take the raw file, run version 3.1.2 of summarize software with parameters a = 1, b = 2, c = 3
+•	Step 2 – run the software separately for each sample
+•	Step 3 – take column three of outputfile.out for each sample in this is the corresponding row in the output data set
+Why is the instruction list important?
+•	Faulty data led to many politicians making decisions that were not based or backed up by facts
+### Downloading Files
+Get/set your working directory
+•	A basic component of working with data is knowing your working directory
+•	The two main commands are getwd() and setwd()
+•	Be aware of relative verse absolute paths
+•	Relative – setwd(“./data”), setwd(“../”) 
+•	Absolute – setwd(“/Users/jtleek/data/”)
+•	Important differences in Windows setwd(“C:\\Users\\Andrew\\Downloads”)
+Checking for and creating directories
+•	file.exists(“directoryName”) will check to see if the directory exists
+•	dir.create(“directoryName”) will create a directory if it doesn’t exist
+•	here is an example checking for a “data” directory and creating it if it doesn’t exist
+if (!file.exists("data")) {
+  dir.create("data")
+}
+Getting data from the Internet-download.file()
+•	Download a file from the Internet
+•	Even if you could do this by hand, helps with reproducibility
+•	Important parameters are url, destfile, method
+•	Useful for downloading tab-delimited, csv, and other files
+Example – Baltimore camera data
+•	public Baltimore camera data
+•	shows you where to download the data
+Download a file from the web
+•	see week 1 downloading a file from the web.R
+Some notes about download.file()
+•	if the URL starts with http you can use download.file()
+•	if the URL starts with https on Windows you may be okay
+•	if the URL starts with https on Mac you may need to set method= “curl”
+•	if the file is big, this might take a while
+•	Be sure to record when you download
+### Reading local flat files
+Example – Baltimore camera data
+Download the file to load
+•	See week 1 reading local files.R
+Loading flat files – read.table()
+•	This is the main function for reading data into R
+•	Flexible and robust but requires more parameters
+•	Reads the data into RAM – big data can cause problems
+•	Important parameters file, header, sep, row.names, nrows
+•	Related: read.csv(), read.csv2()
+Baltimore example
+•	See week 1 reading local files.R
+Example: Baltimore camera data
+•	See week 1 reading local files.R
+•	Part 2 CSV: See week 1 reading local files.R
+Some more important parameters
+•	quote – you can tell R whether there are any quoted values quote = “” means no quotes.
+•	na.strings – that the character that represents a missing value
+•	nrows – how many rows to read of the file (e.g. nrows = 10 reads reads 10 lines) 
+•	skip – number of lines to skip before starting to read
+In my experience, the biggest trouble with reading flat files are quotation marks ‘ or ” placed in data values, setting quote = “” often resolve these.
+### Reading Excel files
+Excel files
+•	Still probably the most widely used format for sharing data
+Example – Baltimore camera data
+•	Using the Baltimore speeding cameras for another example
+Download the file to load
+•	see week 1 reading Excel files.R
+read.xlsx(), read.xlsx2() {xlsx package}
+•	see week 1 reading Excel files.R
+•	There is no Excel file in the Baltimore camera data
+
+
