@@ -225,4 +225,87 @@ head(camera_Data)
  *	see week 1 reading Excel files.R
  *	There is no Excel file in the Baltimore camera data
 
+### Reading XML
+#### XML
 
+ * Extensible markup language
+ * Frequently used story structured data
+ * Particularly widely used in Internet applications
+ * Extracting XML is the basis of most web scrapings
+ * Components
+    + Markup – labels give the text structure
+    + Content – the actual text of the document
+    
+#### Tags, elements and attributes
+
+#### Tags corresponding to general label
+ * Start tags <section>
+ * End tags </section>
+ * Empty tags <line-break/>
+
+#### Elements are specific examples of tags
+
+ * <Greeting> Hello, world </Greeting>
+
+#### Attributes are components of the label
+
+ * <img src="jeff.jpg" alt= "instructor" />
+ * <step number= "3"> Connect A to B. </step>
+
+#### Example XML file
+
+ * http://www.w3schools.com/xml/simple.xml
+
+#### Read the file into R
+
+
+```{r}
+
+library(XML)
+	file_URL <- "https://www.w3schools.com/xml/simple.xml"
+	download.file(file_URL, "~/COURSERA/project_1/week 1/simple.xml")
+	doc  <- xmlTreeParse("~/COURSERA/project_1/week 1/simple.xml",useInternal=TRUE)
+	root_Node <- xmlRoot(doc)
+	xmlName(root_Node)
+
+	names(root_Node)
+
+	
+```
+
+#### Directly access parts of the XML document
+
+```{r}
+
+root_Node[[1]]
+
+root_Node[[1]][[1]]
+
+```
+
+#### Programmatically extract parts of the file
+
+
+```{r}
+xmlSApply(root_Node,xmlValue)
+```
+
+#### XPath
+
+ * /node Top level node
+ * //node at any level
+ * node[@attr-name] Node with any attribute name
+ * node [@attr-name='bob'] Node with attribute name attr-name='bob'
+ 
+#### Get the item on the menu and prices
+
+```{r}
+
+xpathSApply(root_Node,"//name",xmlValue)
+
+xpathSApply(root_Node,"//price",xmlValue)
+
+```
+
+#### Another example
+where I stopped
