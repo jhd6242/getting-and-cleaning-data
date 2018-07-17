@@ -571,3 +571,117 @@ system.time(read.table(file, header=TRUE, sep="\t"))
  * More notes
  
 ## Week 2
+### Reading from mySQL
+#### mySQL
+
+ * Free and widely used open source database software
+ * Widely used in internet-based applications
+ * Data are structured in
+	+ Databases
+	+ Tables within databases
+	+ Fields within tables
+ * Each row is called a record
+ 
+#### Example structure
+ * a series of linked tables
+
+#### Step 1 – Install MySQL
+
+ * I just installed the packages I didn't have to do anything else
+
+#### Step 2 – Install RMySQL
+ * install.packages("RMySQL") works for my Windows machine I also had to install
+DBI package
+
+#### Example – UCSC database
+
+ * http://genome.ucsc.edu/
+
+#### UCSC MySQL
+
+ * http://genome.ucsc.edu/goldenPath/help/mysql.html
+
+#### Connecting and listing databases
+
+```{r}
+library("RMySQL")
+ucscDb <- dbConnect(MySQL(), user="genome",
+				host="genome-mysql.cse.ucsc.edu")
+result <- dbGetQuery(ucscDb,"show databases;"); dbDisconnect;
+result
+```
+
+#### Connecting to hg19 and listing tables
+
+```{r}
+hg19 <- dbConnect(MySQL(), user="genome", db="hg19",
+				host="genome-mysql.cse.ucsc.edu")
+all_Tables <- dbListTables(hg19)
+length(all_Tables)
+
+all_Tables[1:5]
+
+```
+
+### Getting dimensions of a specific table
+
+```{r}
+dbListFields(hg19,"affyU133Plus2")
+
+dbGetQuery(hg19,"select count(*) from affyU133Plus2")
+```
+
+#### Read from the table
+
+```{r}
+affyData <- dbReadTable(hg19,"affyU133Plus2")
+head(affyData)
+```
+
+#### Select a specific subset
+
+```{r}
+query <- dbSendQuery(hg19, "select * from affyU133Plus2 where misMatches between 1 and 3")
+affyMis <- fetch(query); quantile(affyMis$misMatches)
+
+affMisSmall <- fetch(query,n=10);dbClearResult(query);
+
+dim(affMisSmall)
+```
+
+
+#### Don't forget to close the connection!
+
+```{r}
+dbDisconnect(hg19)
+```
+
+#### Further resources
+ * only use only use the select commands
+ 
+### Reading HDF5
+#### HDF5
+ * Used for storing large data sets
+ * Supports storing a range of data types
+ * Hierarchical data format
+ * groups containing 0 or more data sets and metadata
+	+ Have a group header with group name and list of attributes
+	+ Have a group symbol table with a list of objects in group
+ * datasets multidimensional array of data elements with metadata
+	+ Have a header with name, data type, data space, and storage layout
+	+ Have a data array with the data
+	
+#### R HDF5 package
+
+```{r}
+source("https://bioconductor.org/biocLite.R")
+biocLite("rhdf5")
+
+library(rhdf5)
+created = h5createFile("example.h5")
+created
+```
+
+ * This will install packages from bioconductor, primary use for genomics but also have good "big data" packages
+ * Can be used to interface with HDF5
+ 
