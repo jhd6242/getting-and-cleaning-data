@@ -733,3 +733,154 @@ h5read("example.h5", "foo/A")
 
 #### Notes and further resources
  * HDF5 can be used to optimize reading/writing from disk in R
+
+
+### Reading data from the web
+#### Webscraping
+#### Web Scraping: programmatically extracting data from the HTML code of websites
+
+ * It can be a great way to get data How Netflix reverse engineered Hollywood
+ * Many websites have information you may want to programmatically read
+ * In some cases this is again the terms of service for the website
+ * Attempting to read too many pages to quickly can get your IP address blocked
+
+#### Example: Google scholar
+ * https://scholar.google.com/citations?user=HI-I6C0AAAAJ&hl=en&oi=ao
+
+#### Getting data off webpage and - readLines()
+
+```{r}
+con <- url("https://scholar.google.com/citations?user=HI-I6C0AAAAJ&hl=en&oi=ao")
+html_Code <- readLines(con)
+close(con)
+html_Code
+```
+
+#### Parsing with XML
+
+```{r}
+library(XML)
+library(httr)
+url <- "https://scholar.google.com/citations?user=HI-I6C0AAAAJ&hl=en&oi=ao"
+r <- GET(url)
+html <- htmlTreeParse(r,useInternalNodes=TRUE)
+xpathSApply(html,"//title",xmlValue)
+
+xpathSApply(html,"//td[@class='gsc_a_c']",xmlValue)
+```
+
+#### GET from the httr package
+
+```{r}
+library(httr); html2 <- GET(url)
+content2 <-content(html2, as="text")
+parsed_HTML <- htmlParse(content2 , asText=TRUE)
+xpathSApply(parsed_HTML,"//title",xmlValue)
+
+```
+
+#### Accessing websites with passwords
+
+```{r}
+pg1 <- GET("http://httpbin.org/basic-auth/user/passwd")
+pg1
+```
+
+#### Accessing websites with passwords 2
+
+```{r}
+pg2 <- GET("http://httpbin.org/basic-auth/user/passwd",
+		authenticate("user","passwd"))
+pg2
+
+names(pg2)
+```
+
+#### Using handles
+
+```{r}
+google <- handle("http://google.com")
+pg1 <- GET(handle=google, path="/")
+pg2 <- GET(handle=google, path="search")
+
+```
+
+#### Notes and further resources
+
+### Reading data from APIs
+#### Application programming interfaces
+ * Get data from different applications like twitter and Facebook
+
+#### Creating an application
+ * dev.twitter.com/apps
+
+#### Accessing Twitter from R
+
+```{r}
+library(twitteR)
+
+# Change the next four lines based on your own consumer_key, consume_secret, access_token, and access_secret. 
+consumer_key <- "5BDgoESgJ2kT7UcumY0r0yIKa"
+consumer_secret <- "UekImvQ4gb4B62dubsyGzxBa0QthOgfrIv9oy7vc5oobHeOsXf"
+access_token <- "1021446813847621639-aVuftckMZLWzWcg2kGTX6oQfnmYbrx"
+access_secret <- "r8WGQ6woi4cbGZGQDX606xVYxyMxBY3okMShcmiPvqMEA"
+
+setup_twitter_oauth(consumer_key, consumer_secret, access_token, access_secret)
+tw = twitteR::searchTwitter('#realDonaldTrump + #HillaryClinton', n = 10, since = '2016-11-08', retryOnRateLimit = 1e3)
+d = twitteR::twListToDF(tw)
+
+
+
+
+```
+
+#### A lot of the slides were out of date
+
+### Reading from other sources
+
+#### There is a package for that
+
+ * Roger has a nice video on how there are R packages for most thing that you will want to access.
+ * Here I'm going to briefly review a few useful packages
+ * In general the best way to find out if there are package exists is to Google"data storage mechanism R package"
+	+ For example:" MySQL R package"
+	
+#### Interacting more directly with files
+
+ * file - open a connection to a text file
+ * url - open a connection to a url
+ * gzfile - open a connection to a .gz file
+ * bzfile - open a connection to a .bz2 file
+ * ?connections for more information
+ * Remember to close connections
+
+#### Foreign package
+
+ * loads data from Minitab, S, SAS, SPSS, Stata, Systat
+ * Basic functions read.foo
+	+ read.arff (Weka)
+	+ read.dta (Stata)
+	+ read.mtp (Minitab)
+	+ read.octave (Octave)
+	+ read.spss (SPSS)
+	+ read.xport (SAS)
+ * see the help page for more details
+
+#### Examples of other database packages
+
+#### Reading images
+ * jpeg - cran
+ * readbitmap - cran
+ * png - cran
+ * EBImage(bioconductor) - bioconductor
+
+#### Reading GIS data
+
+ * rdgal - cran
+ * rgeos - cran
+ * raster - cran
+ 
+#### Reading music data
+ * tuneR - cran
+ * seewave - rug.mnhn
+
