@@ -820,10 +820,10 @@ pg2 <- GET(handle=google, path="search")
 library(twitteR)
 
 # Change the next four lines based on your own consumer_key, consume_secret, access_token, and access_secret. 
-consumer_key <- "5BDgoESgJ2kT7UcumY0r0yIKa"
-consumer_secret <- "UekImvQ4gb4B62dubsyGzxBa0QthOgfrIv9oy7vc5oobHeOsXf"
-access_token <- "1021446813847621639-aVuftckMZLWzWcg2kGTX6oQfnmYbrx"
-access_secret <- "r8WGQ6woi4cbGZGQDX606xVYxyMxBY3okMShcmiPvqMEA"
+consumer_key <- "5BDgoESgJ2kT7UcumY0r0yIK"
+consumer_secret <- "UekImvQ4gb4B62dubsyGzxBa0QthOgfrIv9oy7vc5oobHeOs"
+access_token <- "1021446813847621639-aVuftckMZLWzWcg2kGTX6oQfnmYbr"
+access_secret <- "r8WGQ6woi4cbGZGQDX606xVYxyMxBY3okMShcmiPvqM"
 
 setup_twitter_oauth(consumer_key, consumer_secret, access_token, access_secret)
 tw = twitteR::searchTwitter('#realDonaldTrump + #HillaryClinton', n = 10, since = '2016-11-08', retryOnRateLimit = 1e3)
