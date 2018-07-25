@@ -1,0 +1,82 @@
+---
+title: "Untitled"
+author: "Justin DeCross"
+date: "July 25, 2018"
+output: html_document
+---
+### Reading HDF5
+#### HDF5
+ * Used for storing large data sets
+ * Supports storing a range of data types
+ * Hierarchical data format
+ * groups containing 0 or more data sets and metadata
+	+ Have a group header with group name and list of attributes
+	+ Have a group symbol table with a list of objects in group
+ * datasets multidimensional array of data elements with metadata
+	+ Have a header with name, data type, data space, and storage layout
+	+ Have a data array with the data
+	
+#### R HDF5 package
+
+```{r}
+
+source("https://bioconductor.org/biocLite.R")
+biocLite("rhdf5")
+
+library(rhdf5)
+created  <-  h5createFile("example6.h5")
+created
+```
+
+ * This will install packages from bioconductor, primary use for genomics but also have good "big data" packages
+ * Can be used to interface with HDF5
+ 
+#### Create groups
+
+```{r}
+library(rhdf5)
+created = h5createGroup("example6.h5","foo")
+created = h5createGroup("example6.h5","baa")
+created = h5createGroup("example6.h5","foo/foobaa")
+h5ls("example6.h5")
+```
+
+#### Write to groups
+
+```{r}
+A = matrix(1:10, nr=5,nc=2)
+h5write(A,"example6.h5","foo/A")
+B = array(seq(0.1, 2.0, by= 0.1), dim=c(5,2,2))
+attr(B,"scale") <- "liter"
+h5write(B,"example6.h5","foo/foobaa/B")
+h5ls("example6.h5")
+```
+
+#### Write a data set
+
+```{r}
+library(rhdf5)
+df = data.frame(1L:5L, seq(0,1, length.out=5),
+	c("ab","cde","fghi","a","s"), stringsAsFactors=FALSE)
+h5write(df,"example6.h5","df")
+h5ls("example6.h5")
+```
+
+#### Reading data
+
+```{r}
+readA = h5read("example6.h5","foo/A")
+readB = h5read("example6.h5","foo/foobaa/B")
+readds = h5read("example6.h5","df")
+readA
+```
+
+#### Writing and reading chunks
+
+```{r}
+h5write(c(12, 13, 14),"example6.h5","foo/A", index=list(1:3, 1))
+h5read("example6.h5", "foo/A")
+```
+
+#### Notes and further resources
+ * HDF5 can be used to optimize reading/writing from disk in R
