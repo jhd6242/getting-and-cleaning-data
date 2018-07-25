@@ -43,9 +43,11 @@ EDU <- fread(destination4)
 merge = merge(GDP, EDU, by = 'CountryCode')
 nrow(merge)
 var <- arrange(merge, desc(Rank))
+
 var[12, 'Economy']
 
 tapply(merge$Rank, merge$'Income Group', mean)
 
 merge$RankGroups <- cut2(merge$Rank, g = 5)
 table(merge$RankGroups, merge$'Income Group')
+select(cran, r_arch:country)
