@@ -659,80 +659,6 @@ dbDisconnect(hg19)
 #### Further resources
  * only use only use the select commands
  
-### Reading HDF5
-#### HDF5
- * Used for storing large data sets
- * Supports storing a range of data types
- * Hierarchical data format
- * groups containing 0 or more data sets and metadata
-	+ Have a group header with group name and list of attributes
-	+ Have a group symbol table with a list of objects in group
- * datasets multidimensional array of data elements with metadata
-	+ Have a header with name, data type, data space, and storage layout
-	+ Have a data array with the data
-	
-#### R HDF5 package
-
-```{r}
-source("https://bioconductor.org/biocLite.R")
-biocLite("rhdf5")
-
-library(rhdf5)
-created = h5createFile("example.h5")
-created
-```
-
- * This will install packages from bioconductor, primary use for genomics but also have good "big data" packages
- * Can be used to interface with HDF5
- 
-#### Create groups
-
-```{r}
-library(rhdf5)
-created = h5createGroup("example.h5","foo")
-created = h5createGroup("example.h5","baa")
-created = h5createGroup("example.h5","foo/foobaa")
-h5ls("example.h5")
-```
-
-#### Write to groups
-
-```{r}
-A = matrix(1:10, nr=5,nc=2)
-h5write(A,"example.h5","foo/A")
-B = array(seq(0.1, 2.0, by= 0.1), dim=c(5,2,2))
-attr(B,"scale") <- "liter"
-h5write(B,"example.h5","foo/foobaa/B")
-h5ls("example.h5")
-```
-
-#### Write a data set
-
-```{r}
-df = data.frame(1L:5L, seq(0,1, length.out=5),
-	c("ab","cde","fghi","a","s"), stringsAsFactors=FALSE)
-h5write(df,"example.h5","df")
-h5ls("example.h5")
-```
-
-#### Reading data
-
-```{r}
-readA = h5read("example.h5","foo/A")
-readB = h5read("example.h5","foo/foobaa/B")
-readds = h5read("example.h5","df")
-readA
-```
-
-#### Writing and reading chunks
-
-```{r}
-h5write(c(12, 13, 14),"example.h5","foo/A", index=list(1:3, 1))
-h5read("example.h5", "foo/A")
-```
-
-#### Notes and further resources
- * HDF5 can be used to optimize reading/writing from disk in R
 
 
 ### Reading data from the web
@@ -820,14 +746,14 @@ pg2 <- GET(handle=google, path="search")
 library(twitteR)
 
 # Change the next four lines based on your own consumer_key, consume_secret, access_token, and access_secret. 
-consumer_key <- "5BDgoESgJ2kT7UcumY0r0yIK"
-consumer_secret <- "UekImvQ4gb4B62dubsyGzxBa0QthOgfrIv9oy7vc5oobHeOs"
-access_token <- "1021446813847621639-aVuftckMZLWzWcg2kGTX6oQfnmYbr"
-access_secret <- "r8WGQ6woi4cbGZGQDX606xVYxyMxBY3okMShcmiPvqM"
+#consumer_key <- "5BDgoESgJ2kT7UcumY0r0yIK"
+# consumer_secret <- # "UekImvQ4gb4B62dubsyGzxBa0QthOgfrIv9oy7vc5oobHeOs"
+# access_token <- "1021446813847621639-aVuftckMZLWzWcg2kGTX6oQfnmYbr"
+# access_secret <- "r8WGQ6woi4cbGZGQDX606xVYxyMxBY3okMShcmiPvqM"
 
-setup_twitter_oauth(consumer_key, consumer_secret, access_token, access_secret)
-tw = twitteR::searchTwitter('#realDonaldTrump + #HillaryClinton', n = 10, since = '2016-11-08', retryOnRateLimit = 1e3)
-d = twitteR::twListToDF(tw)
+# setup_twitter_oauth(consumer_key, consumer_secret, access_token, # access_secret)
+# tw = twitteR::searchTwitter('#realDonaldTrump + #HillaryClinton', # n = 10, since = '2016-11-08', retryOnRateLimit = 1e3)
+# d = twitteR::twListToDF(tw)
 
 
 
@@ -883,4 +809,353 @@ d = twitteR::twListToDF(tw)
 #### Reading music data
  * tuneR - cran
  * seewave - rug.mnhn
+
+## Week 3
+
+### Subsetting And Sorting
+#### Subsetting – quick review
+
+```{r}
+set.seed(13435)
+x <- data.frame("var1"=sample(1:5),"var2"=sample(6:10),"var3"=sample(11:15))
+x <- x[sample(1:5),];x$var2[c(1,3)] = NA
+x
+```		
+
+#### Subsetting – quick review2
+
+```{r}
+x[,1]
+
+x[,"var1"]
+
+x[1:2,"var2"]
+
+```
+
+#### Logicals ands and ors
+
+```{r}
+x[(x$var1 <= 3  & x$var3 > 11),]
+
+x[(x$var1 <= 3 | x$var3 > 15),]
+```
+
+#### Dealing with missing values
+
+```{r}
+x[which(x$var2 > 8),]
+```
+
+#### Sorting
+
+```{r}
+sort(x$var1)
+
+sort(x$var1, decreasing=TRUE)
+
+sort(x$var2, na.last=TRUE)
+```
+
+
+#### Ordering
+
+```{r}
+x[order(x$var1),]
+```
+
+#### Ordering 2
+
+```{r}
+x[order(x$var1,x$var3),]
+
+```
+
+#### Ordering with plyr
+
+```{r}
+library(plyr)
+
+arrange(x,var1)
+
+arrange(x,desc(var1))
+
+```
+
+#### Adding rows and columns
+
+```{r}
+x$var4 <- rnorm(5)
+
+x
+```
+
+#### Adding rows and columns 2
+
+```{r}
+y <- cbind(x,rnorm(5))
+
+y
+```
+
+#### Notes and further resources
+
+ * A lot more information on sub setting
+
+### Summarizing Data
+
+#### Example data set
+ * https://data.baltimorecity.gov/api/views/k5ry-ef3g/rows.csv?accessType=DOWNLOAD
+
+#### Getting the data from the web
+
+```{r}
+if(!file.exists("~/COURSERA/project_1/week 1")) {dir.create("~/COURSERA/project_1/week 1")}
+file_URL <- "https://data.baltimorecity.gov/api/views/k5ry-ef3g/rows.csv?accessType=DOWNLOAD"
+
+download.file(file_URL,destfile = ("~/COURSERA/project_1/week 1/restaurant.csv"))
+
+rest_data <- read.csv("~/COURSERA/project_1/week 1/restaurant.csv")
+```
+
+#### Look at a bit of the data
+
+```{r}
+head(rest_data,n=3)
+
+tail(rest_data,n=3)
+```
+
+#### Make summary
+
+```{r}
+summary(rest_data)
+```
+
+#### Mpre in-depth information
+
+```{r}
+str(rest_data)
+```
+
+#### Quantile of quantitative variables
+
+```{r}
+quantile(rest_data$councilDistrict,na.rm=TRUE)
+
+quantile(rest_data$councilDistrict,probs=c(0.5, 0.75, 0.9))
+```
+
+#### Make table
+
+```{r}
+table(rest_data$zipCode, useNA="ifany")
+```
+
+#### Make table 2
+
+```{r}
+table(rest_data$councilDistrict, rest_data$zipCode)
+```
+
+#### Check for missing values
+
+```{r}
+sum(is.na(rest_data$councilDistrict))
+
+any(is.na(rest_data$councilDistrict))
+
+all(rest_data$zipCode > 0)
+```
+
+#### Row and column sums
+
+```{r}
+colSums(is.na(rest_data))
+
+all(colSums(is.na(rest_data))==0)
+```
+
+#### Values with specific characteristics
+
+```{r}
+table(rest_data$zipCode %in%  c("21212"))
+
+table(rest_data$zipCode %in% c("21212","21213"))
+```
+
+#### Values with specific characteristics 2
+
+```{r}
+rest_data[rest_data$zipCode  %in% c("21212"," 21213"),]
+```
+
+
+#### Cross tabs
+
+```{r}
+data(UCBAdmissions)
+DF <- as.data.frame(UCBAdmissions)
+summary(DF)
+```
+
+#### Cross tabs 2
+
+```{r}
+xt <- xtabs(Freq ~Gender + Admit, data= DF)
+xt
+```
+
+#### Flat tables
+
+```{r}
+warpbreaks$replicate <- rep(1:9, len = 54)
+xt  <-  xtabs(breaks~.,,data=warpbreaks)
+xt
+```
+
+#### Flat tables 2
+```{r}
+ftable(xt)
+```
+
+#### Size of data set
+
+```{r}
+fake_data <- rnorm(1e5)
+object.size(fake_data)
+
+print(object.size(fake_data), units = "Mb")
+```
+
+### Creating New Variables
+#### Why create new variable?
+ * Often the raw data won't have a value you are looking for
+ * You will need to transform the data to get the values you would like
+ * Usually you will add much value to the data frames you are working with
+ * Common variables to create
+	+ Missingness indicators
+	+ "Cutting up" quantitative variables
+	+ Applying transforms
+
+#### Example data set
+
+ * Baltimore restaurant data set
+
+#### Getting the data from the web
+
+```{r}
+if(!file.exists("~/COURSERA/project_1/week 1")) {dir.create("~/COURSERA/project_1/week 1")}
+file_URL <- "https://data.baltimorecity.gov/api/views/k5ry-ef3g/rows.csv?accessType=DOWNLOAD"
+
+download.file(file_URL,destfile = ("~/COURSERA/project_1/week 1/restaurant.csv"))
+
+rest_data <- read.csv("~/COURSERA/project_1/week 1/restaurant.csv")
+```
+
+#### Creating sequences
+ * Sometimes you need or index for your data set
+```{r}
+s1 <- seq(1, 10, by=2) ; s1
+
+s2 <- seq(1, 10, length=3); s2
+
+x <- c(1, 3, 8, 25, 100); seq(along = x)
+
+```
+
+#### Subsetting variables
+
+```{r}
+rest_data$nearMe <- rest_data$neighborhood %in% c("Roland Park","Homeland")
+table(rest_data$nearMe)
+```
+
+#### Creating binary variable
+
+```{r}
+rest_data$zipWrong <- ifelse(rest_data$zipCode < 0,TRUE,FALSE)
+table(rest_data$zipWrong, rest_data$zipCode < 0)
+```
+
+```{r}
+rest_data$zipGroups <- cut(rest_data$zipCode, breaks=quantile(rest_data$zipCode))
+table(rest_data$zipGroups)
+
+table(rest_data$zipGroups,rest_data$zipCode)
+```
+
+#### Easier cutting
+
+```{r}
+library(Hmisc)
+rest_data$zipGroups = cut2(rest_data$zipCode,g=4)
+table(rest_data$zipGroups)
+```
+
+#### Creating factor variables
+
+```{r}
+rest_data$zcf <- factor(rest_data$zipCode)
+rest_data$zcf[1:10]
+
+class(rest_data$zcf)
+```
+
+#### Levels of factor variables
+
+```{r}
+yes_no <- sample(c("yes","no"), size=10, replace=TRUE)
+yes_no_fac = factor(yes_no, levels=c("yes","no"))
+relevel(yes_no_fac, ref= "yes")
+
+as.numeric(yes_no_fac)
+
+```
+
+#### Cutting produces factor variables
+
+```{r}
+library(Hmisc)
+rest_data$zipGroups <- cut2(rest_data$zipCode, g=4)
+table(rest_data$zipGroups)
+
+```
+
+
+#### Using the mutate function
+
+```{r}
+library(Hmisc);library(plyr)
+rest_data2 = mutate(rest_data, zipGroups= cut2(zipCode,g=4))
+table(rest_data2$zipGroups)
+```
+
+#### Common transforms
+ * abs(x) absolute value
+ * sqrt(x) square root
+ * ceiling(x) ceiling(3.475) is 4
+ * floor(x) floor(3.475) is 3
+ * round(x, digits=n) roun(3.475, digits=2) is 3.48
+ * signif(x, digits=n) signif(3.475, digits=2) is 3.5
+ * cos(x), sin(x) ect.
+ * log(x) natural logarithm
+ * log2(x), log10(x) other common logs
+ * exp(2) exponentiating x
+ 
+#### Notes and further reading
+
+### Reshaping Data
+#### The goal is tidy data
+
+ * Each variable forms a column
+ * Each observation form a row
+ * Each table/file stores data about one kind of observation(e.g.people/hospitals)
+
+#### Start with reshaping
+
+```{r}
+library(reshape2)
+head(mtcars)
+```
 
