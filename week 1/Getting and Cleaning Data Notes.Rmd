@@ -1123,6 +1123,7 @@ table(rest_data$zipGroups)
 ```
 
 
+
 #### Using the mutate function
 
 ```{r}
@@ -1159,3 +1160,85 @@ library(reshape2)
 head(mtcars)
 ```
 
+#### Melting data frames
+
+```{r}
+mtcars$carname <- rownames(mtcars)
+car_Melt <- melt(mtcars, id=c("carname","gear","cyl"), measure.vars=c("mpg","hp"))
+head(car_Melt,n=3)
+
+tail(car_Melt,n=3)
+
+```
+
+#### Casting data frames
+
+```{r}
+cycle_data <- dcast(car_Melt, cyl ~ variable)
+cycle_data
+
+cycle_data <- dcast(car_Melt,cyl ~variable, mean)
+cycle_data
+```
+
+#### Averaging values
+
+```{r}
+head(InsectSprays)
+tapply(InsectSprays$count,InsectSprays$spray,sum)
+```
+
+#### Another way-split
+
+```{r}
+spIns <- split(InsectSprays$count,InsectSprays$spray)
+spIns
+```
+
+#### Another way – apply
+
+```{r}
+sprCount <- lapply(spIns, sum)
+sprCount
+```
+
+#### Another way – combine
+```{r}
+unlist(sprCount)
+
+sapply(spIns, sum)
+```
+
+#### Another way – plyr package
+
+```{r}
+
+# library(plyr)
+# InsectSprays
+# ddply(InsectSprays,"spray", summarize, sum=sum(count))
+
+```
+
+#### Creating a new variable
+
+```{r}
+# spray_sum <- ddply(InsectSprays,.(spray), summarize, sum=ave(count, FUN=sum))
+# dim(spray_sum)
+
+# head(spray_sum)
+```
+#### More information
+
+ * See also the functions
+ * acast – for casting and multidimensional arrays
+ * arrange – for faster reordering without using order() commands
+ * mutate – adding new variables
+ 
+### Managing data frames with dplyr – Introduction
+
+#### dplyr
+The data frame is a key data structure in statistics and in R
+ * There is one observation per row
+ * Each column represents a variable or measure or characteristic
+ * Primary implementation that you will use is the default R implementation
+ * Other implementations, particularly relational databases systems
